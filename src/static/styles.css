@@ -133,6 +133,30 @@ section h3 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex-grow: 1;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #ffebee;
+  color: #c62828;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.8;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  opacity: 1;
+  background-color: #ef5350;
+  color: white;
 }
 
 .form-group {

@@ -67,8 +67,54 @@ document.addEventListener("DOMContentLoaded", () => {
             nameSpan.className = "participant-name";
             nameSpan.textContent = email;
 
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "delete-button";
+            deleteButton.textContent = "×";
+            deleteButton.title = "Unregister participant";
+            
+            deleteButton.addEventListener("click", async () => {
+              try {
+                const response = await fetch(
+                  `/activities/${encodeURIComponent(name)}/signup?email=${encodeURIComponent(email)}`,
+                  { method: "DELETE" }
+                );
+
+                if (response.ok) {
+                  li.remove();
+                  messageDiv.textContent = `Successfully unregistered ${email} from ${name}`;
+                  messageDiv.className = "success";
+                } else {
+                  const result = await response.json();
+                  messageDiv.textContent = result.detail || "Failed to unregister participant";
+                  messageDiv.className = "error";
+                }
+
+                messageDiv.classList.remove("hidden");
+                setTimeout(() => {
+                  messageDiv.classList.add("hidden");
+                }, 5000);
+
+                // Update spots available
+                const activityCard = deleteButton.closest(".activity-card");
+                const availabilityP = Array.from(activityCard.children).find(el => 
+                  el.tagName === "P" && el.textContent.includes("Availability")
+                );
+                if (availabilityP) {
+                  const details = activities[name];
+                  const spotsLeft = details.max_participants - (details.participants.length - 1);
+                  availabilityP.innerHTML = `<strong>Availability:</strong> ${spotsLeft} spots left`;
+                }
+              } catch (error) {
+                console.error("Error unregistering:", error);
+                messageDiv.textContent = "Failed to unregister. Please try again.";
+                messageDiv.className = "error";
+                messageDiv.classList.remove("hidden");
+              }
+            });
+
             li.appendChild(avatar);
             li.appendChild(nameSpan);
+            li.appendChild(deleteButton);
             ul.appendChild(li);
           });
 
