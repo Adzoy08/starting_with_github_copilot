@@ -20,14 +20,60 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Add participants section container to the card markup
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants-section">
+            <h5>Participants</h5>
+            <div class="participants-container"></div>
+          </div>
         `;
 
         activitiesList.appendChild(activityCard);
+
+        // Populate participants list (either a styled list or a friendly message)
+        const participantsContainer = activityCard.querySelector(".participants-container");
+        const participants = Array.isArray(details.participants) ? details.participants : [];
+
+        if (participants.length === 0) {
+          const noP = document.createElement("p");
+          noP.className = "info";
+          noP.textContent = "No participants yet. Be the first to sign up!";
+          participantsContainer.appendChild(noP);
+        } else {
+          const ul = document.createElement("ul");
+          ul.className = "participants-list";
+
+          participants.forEach((email) => {
+            const li = document.createElement("li");
+            li.className = "participant-item";
+
+            const avatar = document.createElement("span");
+            avatar.className = "participant-avatar";
+            // Build initials from the local part of the email (before @)
+            const local = (email.split("@")[0] || "").replace(/[^a-zA-Z0-9.\-_]/g, "");
+            const initials = local
+              .split(/[\.\-_]/)
+              .map((s) => (s ? s[0] : ""))
+              .join("")
+              .slice(0, 2)
+              .toUpperCase();
+            avatar.textContent = initials || "?";
+
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "participant-name";
+            nameSpan.textContent = email;
+
+            li.appendChild(avatar);
+            li.appendChild(nameSpan);
+            ul.appendChild(li);
+          });
+
+          participantsContainer.appendChild(ul);
+        }
 
         // Add option to select dropdown
         const option = document.createElement("option");
